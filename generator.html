@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>snacks.js Generator — the snack menu</title>
+<meta name="description" content="Build your snack list visually and export a ready-to-upload snacks.js file. No coding required." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg-0:#02040c;--bg-1:#050b1e;--ink:#eaf2ff;--ink-soft:#9fb2d8;--ink-dim:#5f739e;
+  --cyan:#33e1ff;--cyan-glow:rgba(51,225,255,.55);--line:rgba(120,170,255,.14);
+  --card:rgba(14,28,72,.55);--danger:#ff6b8a;
+  --font-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --font-body:"Manrope",ui-sans-serif,system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;
+  background:
+   radial-gradient(1000px 700px at 85% -10%,rgba(51,225,255,.14),transparent 60%),
+   radial-gradient(900px 800px at 5% 5%,rgba(41,90,255,.18),transparent 55%),
+   linear-gradient(180deg,var(--bg-1),var(--bg-0));min-height:100vh}
+::selection{background:var(--cyan);color:#02040c}
+
+.wrap{max-width:1200px;margin:0 auto;padding:clamp(24px,5vw,60px) clamp(16px,4vw,40px) 80px}
+
+header.top{margin-bottom:40px}
+.eyebrow{font-size:.7rem;letter-spacing:.32em;text-transform:uppercase;color:var(--cyan);font-weight:700;display:flex;align-items:center;gap:10px}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+h1{font-family:var(--font-display);font-weight:800;letter-spacing:-.03em;line-height:1;
+  font-size:clamp(2.4rem,6vw,4rem);margin:16px 0 12px}
+h1 span{color:var(--cyan)}
+.lede{color:var(--ink-soft);max-width:620px;font-size:1.02rem}
+
+.layout{display:grid;grid-template-columns:1fr 440px;gap:28px;align-items:start;margin-top:34px}
+
+/* editor */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.panel-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.panel-head h2{font-family:var(--font-display);font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+.panel-head .n{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim)}
+.panel-body{padding:16px}
+
+.snack-row{border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;background:rgba(4,9,26,.4);
+  transition:border-color .3s var(--ease),box-shadow .3s var(--ease)}
+.snack-row.invalid{border-color:rgba(255,107,138,.5)}
+.snack-row:hover{border-color:rgba(51,225,255,.35)}
+.row-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px}
+.row-preview{display:flex;align-items:center;gap:10px;min-width:0}
+.row-preview .pe{font-size:1.7rem;line-height:1}
+.row-preview .pt{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-preview .pcat{font-size:.72rem;color:var(--ink-dim);letter-spacing:.06em}
+.row-actions{display:flex;gap:4px;flex-shrink:0}
+.icon-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:rgba(51,225,255,.06);
+  color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;font-size:.95rem;transition:all .2s var(--ease)}
+.icon-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.icon-btn.del:hover{border-color:var(--danger);color:var(--danger)}
+.icon-btn:disabled{opacity:.3;cursor:not-allowed}
+
+.fields{display:grid;grid-template-columns:70px 1fr 90px;gap:10px}
+.fields .full{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f label{display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:5px;font-weight:700}
+.f input{width:100%;background:rgba(2,6,20,.6);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  color:var(--ink);font-family:var(--font-body);font-size:.9rem;transition:border-color .25s var(--ease),box-shadow .25s var(--ease)}
+.f input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(51,225,255,.14)}
+.f input.err{border-color:var(--danger)}
+.f input::placeholder{color:var(--ink-dim)}
+.f .hint{font-size:.66rem;color:var(--ink-dim);margin-top:4px}
+
+.add-btn{width:100%;border:1px dashed rgba(51,225,255,.4);background:rgba(51,225,255,.06);color:var(--cyan);
+  border-radius:14px;padding:14px;font-weight:700;font-family:var(--font-body);cursor:pointer;font-size:.95rem;
+  transition:background .25s var(--ease),transform .2s var(--ease)}
+.add-btn:hover{background:rgba(51,225,255,.14)}
+.add-btn:active{transform:scale(.99)}
+
+/* output */
+.out{position:sticky;top:24px}
+.out .panel-head{background:rgba(4,9,26,.4)}
+.err-banner{margin:0 16px 12px;padding:12px 14px;border-radius:12px;background:rgba(255,107,138,.12);
+  border:1px solid rgba(255,107,138,.4);color:#ffb0c2;font-size:.82rem;font-weight:600;display:none}
+.err-banner.show{display:block}
+textarea#code{width:100%;height:46vh;min-height:320px;resize:vertical;background:#01030a;border:none;border-top:1px solid var(--line);
+  color:#bfe9ff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;line-height:1.55;padding:16px;white-space:pre;overflow:auto}
+textarea#code:focus{outline:none}
+.out-actions{display:flex;gap:10px;padding:16px}
+.btn{flex:1;border:none;border-radius:12px;padding:14px;font-weight:800;font-family:var(--font-body);font-size:.92rem;cursor:pointer;
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease),opacity .25s}
+.btn-primary{background:var(--cyan);color:#02040c;box-shadow:0 12px 34px -12px var(--cyan-glow)}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px)}
+.btn-ghost{background:rgba(51,225,255,.08);color:var(--cyan);border:1px solid var(--line)}
+.btn-ghost:hover:not(:disabled){border-color:var(--cyan)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.toast{text-align:center;color:var(--cyan);font-size:.8rem;font-weight:600;padding:0 16px 14px;min-height:20px}
+
+.steps{margin-top:34px;border-top:1px solid var(--line);padding-top:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.step .sn{font-family:var(--font-display);color:var(--cyan);font-weight:700;font-size:.85rem}
+.step p{color:var(--ink-soft);font-size:.86rem;margin-top:6px}
+
+@media (max-width:920px){
+  .layout{grid-template-columns:1fr}
+  .out{position:relative;top:0;order:-1}
+  textarea#code{height:280px}
+  .steps{grid-template-columns:1fr 1fr}
+}
+@media (max-width:480px){
+  .fields{grid-template-columns:60px 1fr}
+  .fields .price-f{grid-column:2/3}
+  .steps{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow"><span class="dot"></span>the snack menu · admin tool</div>
+    <h1>snacks.js <span>generator</span></h1>
+    <p class="lede">Build your menu visually — add, edit, reorder, and delete snacks. When you're happy, copy or download a ready-to-upload <code>snacks.js</code>. Your live site's <code>index.html</code> is never touched.</p>
+  </header>
+
+  <div class="layout">
+    <!-- EDITOR -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Your snacks</h2>
+        <span class="n" id="rowCount">0 items</span>
+      </div>
+      <div class="panel-body">
+        <div id="rows"></div>
+        <button class="add-btn" id="addBtn" type="button">+ Add a snack</button>
+      </div>
+    </section>
+
+    <!-- OUTPUT -->
+    <section class="panel out">
+      <div class="panel-head">
+        <h2>snacks.js</h2>
+        <span class="n" id="validState">ready</span>
+      </div>
+      <div class="err-banner" id="errBanner"></div>
+      <textarea id="code" readonly spellcheck="false"></textarea>
+      <div class="out-actions">
+        <button class="btn btn-ghost" id="copyBtn" type="button">📋 Copy</button>
+        <button class="btn btn-primary" id="dlBtn" type="button">⬇ Download snacks.js</button>
+      </div>
+      <div class="toast" id="toast"></div>
+    </section>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="sn">01</div><p>Add or edit snacks in the list on the left.</p></div>
+    <div class="step"><div class="sn">02</div><p>New categories appear automatically — just type one.</p></div>
+    <div class="step"><div class="sn">03</div><p>Click <b>Download snacks.js</b> (or Copy).</p></div>
+    <div class="step"><div class="sn">04</div><p>Upload it to GitHub, replacing the old file. Done.</p></div>
+  </div>
+
+</div>
+
+<datalist id="catList"></datalist>
+
+<script>
+(function(){
+  "use strict";
+
+  /* This exact header is preserved verbatim at the top of every generated file. */
+  var HEADER =
+'/*\n' +
+' * \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n' +
+' * \u2502  THE SNACK MENU \u2014 snack data                                  \u2502\n' +
+' * \u2502  This is the ONLY file you edit to update the shop.           \u2502\n' +
+' * \u2502                                                               \u2502\n' +
+' * \u2502  To add a snack, copy a block below and change the values.    \u2502\n' +
+' * \u2502  Fields:                                                      \u2502\n' +
+' * \u2502    emoji     (string)  the snack emoji            [required]  \u2502\n' +
+' * \u2502    name      (string)  the snack name             [required]  \u2502\n' +
+' * \u2502    price     (number)  price in dollars           [required]  \u2502\n' +
+' * \u2502    category  (string)  groups the snack           [required]  \u2502\n' +
+' * \u2502    badge     (string)  optional tag e.g. "New"    [optional]  \u2502\n' +
+' * \u2502                                                               \u2502\n' +
+' * \u2502  New categories appear automatically \u2014 no HTML editing.       \u2502\n' +
+' * \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n' +
+' */';
+
+  /* starter data (matches your current shop) */
+  var items = [
+    { emoji:"\uD83E\uDD64", name:"Capri Sun",       price:"1.00", category:"Drinks", badge:"" },
+    { emoji:"\uD83C\uDF36\uFE0F", name:"Takis",     price:"1.00", category:"Chips",  badge:"Popular" },
+    { emoji:"\uD83C\uDF6B", name:"M&Ms",            price:"1.25", category:"Candy",  badge:"" },
+    { emoji:"\uD83C\uDF6C", name:"Trident Tropical",price:"2.00", category:"Gum",    badge:"\u2B50 Best Seller" },
+    { emoji:"\uD83D\uDFE2", name:"Extra Gum 15ct",  price:"1.80", category:"Gum",    badge:"" }
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var rowsEl = $("rows");
+
+  /* ---------- validation ---------- */
+  function rowValid(s){
+    return s.emoji.trim() && s.name.trim() && s.category.trim() &&
+           s.price !== "" && !isNaN(Number(s.price)) && Number(s.price) >= 0;
+  }
+  function allValid(){
+    return items.length > 0 && items.every(rowValid);
+  }
+
+  /* ---------- code generation ---------- */
+  function objBlock(s){
+    var lines = [];
+    lines.push('    emoji: ' + JSON.stringify(s.emoji.trim()));
+    lines.push('    name: ' + JSON.stringify(s.name.trim()));
+    lines.push('    price: ' + Number(s.price).toFixed(2));
+    lines.push('    category: ' + JSON.stringify(s.category.trim()));
+    if(s.badge && s.badge.trim()) lines.push('    badge: ' + JSON.stringify(s.badge.trim()));
+    return '  {\n' + lines.join(',\n') + '\n  }';
+  }
+  function generate(){
+    var blocks = items.map(objBlock).join(',\n');
+    return HEADER + '\n\n' + 'const snacks = [\n' + blocks + '\n];\n';
+  }
+
+  /* ---------- output refresh ---------- */
+  function refreshOutput(){
+    $("code").value = generate();
+    var ok = allValid();
+    $("copyBtn").disabled = !ok;
+    $("dlBtn").disabled = !ok;
+    $("validState").textContent = ok ? "valid \u2713" : "fix errors";
+    $("validState").style.color = ok ? "var(--cyan)" : "var(--danger)";
+
+    var banner = $("errBanner");
+    if(ok){ banner.classList.remove("show"); }
+    else{
+      var bad = items.filter(function(s){ return !rowValid(s); }).length;
+      banner.textContent = "\u26A0\uFE0F " + bad + " snack" + (bad>1?"s":"") +
+        " missing required fields (emoji, name, price, category). Fill them in to enable export.";
+      banner.classList.add("show");
+    }
+  }
+
+  function refreshDatalist(){
+    var cats = [];
+    items.forEach(function(s){ var c = s.category.trim(); if(c && cats.indexOf(c)===-1) cats.push(c); });
+    $("catList").innerHTML = cats.map(function(c){ return '<option value="'+c.replace(/"/g,'&quot;')+'">'; }).join("");
+  }
+
+  function refreshPreview(idx){
+    var row = rowsEl.querySelector('[data-idx="'+idx+'"]');
+    if(!row) return;
+    var s = items[idx];
+    row.querySelector(".pe").textContent = s.emoji.trim() || "\uD83C\uDF6C";
+    row.querySelector(".pt").textContent = s.name.trim() || "Untitled snack";
+    row.querySelector(".pcat").textContent = (s.category.trim() || "No category") +
+      (s.badge.trim() ? "  \u00B7  " + s.badge.trim() : "");
+    row.classList.toggle("invalid", !rowValid(s));
+    ["emoji","name","price","category"].forEach(function(f){
+      var inp = row.querySelector('[data-field="'+f+'"]');
+      var empty = (f==="price") ? (s.price==="" || isNaN(Number(s.price))) : !s[f].trim();
+      inp.classList.toggle("err", empty);
+    });
+  }
+
+  /* ---------- render one row ---------- */
+  function rowHTML(s, i){
+    return '' +
+    '<div class="snack-row" data-idx="'+i+'">' +
+      '<div class="row-top">' +
+        '<div class="row-preview">' +
+          '<span class="pe"></span>' +
+          '<div style="min-width:0"><div class="pt"></div><div class="pcat"></div></div>' +
+        '</div>' +
+        '<div class="row-actions">' +
+          '<button class="icon-btn" type="button" data-act="up"   title="Move up">\u2191</button>' +
+          '<button class="icon-btn" type="button" data-act="down" title="Move down">\u2193</button>' +
+          '<button class="icon-btn" type="button" data-act="dup"  title="Duplicate">\u29C9</button>' +
+          '<button class="icon-btn del" type="button" data-act="del" title="Delete">\uD83D\uDDD1</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fields">' +
+        '<div class="f"><label>Emoji</label><input data-field="emoji" type="text" maxlength="8" placeholder="\uD83C\uDF6B"></div>' +
+        '<div class="f"><label>Name</label><input data-field="name" type="text" placeholder="Snack name"></div>' +
+        '<div class="f price-f"><label>Price $</label><input data-field="price" type="number" step="0.01" min="0" placeholder="1.00"></div>' +
+        '<div class="full">' +
+          '<div class="f"><label>Category</label><input data-field="category" type="text" list="catList" placeholder="Drinks"><div class="hint">Type a new name to create a category</div></div>' +
+          '<div class="f"><label>Badge (optional)</label><input data-field="badge" type="text" placeholder="e.g. New, Popular"></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ---------- full render (structural changes) ---------- */
+  function render(){
+    rowsEl.innerHTML = items.map(rowHTML).join("");
+    // populate values + wire events per row
+    items.forEach(function(s, i){
+      var row = rowsEl.querySelector('[data-idx="'+i+'"]');
+      ["emoji","name","price","category","badge"].forEach(function(f){
+        var inp = row.querySelector('[data-field="'+f+'"]');
+        inp.value = s[f];
+        inp.addEventListener("input", function(){
+          items[i][f] = inp.value;
+          if(f==="category") refreshDatalist();
+          refreshPreview(i);
+          refreshOutput();
+        });
+      });
+      row.querySelectorAll("[data-act]").forEach(function(btn){
+        btn.addEventListener("click", function(){ doAction(btn.getAttribute("data-act"), i); });
+      });
+      // disable up on first, down on last
+      if(i===0) row.querySelector('[data-act="up"]').disabled = true;
+      if(i===items.length-1) row.querySelector('[data-act="down"]').disabled = true;
+      refreshPreview(i);
+    });
+    $("rowCount").textContent = items.length + (items.length===1?" item":" items");
+    refreshDatalist();
+    refreshOutput();
+  }
+
+  function doAction(act, i){
+    if(act==="del"){ items.splice(i,1); }
+    else if(act==="dup"){ items.splice(i+1, 0, Object.assign({}, items[i])); }
+    else if(act==="up" && i>0){ var t=items[i]; items[i]=items[i-1]; items[i-1]=t; }
+    else if(act==="down" && i<items.length-1){ var u=items[i]; items[i]=items[i+1]; items[i+1]=u; }
+    render();
+  }
+
+  /* ---------- top-level buttons ---------- */
+  $("addBtn").addEventListener("click", function(){
+    items.push({ emoji:"", name:"", price:"", category:"", badge:"" });
+    render();
+    // focus the new row's emoji input
+    var last = rowsEl.querySelector('[data-idx="'+(items.length-1)+'"] [data-field="emoji"]');
+    if(last) last.focus();
+    last && last.scrollIntoView({behavior:"smooth", block:"center"});
+  });
+
+  function toast(msg){
+    var t = $("toast"); t.textContent = msg;
+    setTimeout(function(){ if(t.textContent===msg) t.textContent=""; }, 2600);
+  }
+
+  $("copyBtn").addEventListener("click", function(){
+    if(!allValid()) return;
+    var code = generate();
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(function(){ toast("\u2705 Copied to clipboard"); },
+        function(){ fallbackCopy(code); });
+    } else fallbackCopy(code);
+  });
+  function fallbackCopy(code){
+    var ta = $("code"); ta.removeAttribute("readonly"); ta.select();
+    try{ document.execCommand("copy"); toast("\u2705 Copied to clipboard"); }
+    catch(e){ toast("Press Ctrl/Cmd+C to copy"); }
+    ta.setAttribute("readonly","readonly");
+  }
+
+  $("dlBtn").addEventListener("click", function(){
+    if(!allValid()) return;
+    var blob = new Blob([generate()], { type:"text/javascript;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "snacks.js";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast("\u2B07 Downloaded snacks.js");
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
