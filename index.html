@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Yenner Snack Mart</title>
-<meta name="description" content="Yenner Snack Mart — Online Snack Ordering Portal. Browse our product catalog, place your order, and pay with cash at pickup." />
+<meta name="description" content="Yenner Snack Mart — Online Snack Ordering Portal. Browse our product catalog, place your order, and pay at delivery via Cash, Cash App, Venmo, PayPal, or paper check." />
 
 <style>
 /* ============================================================
@@ -144,6 +144,14 @@ a:hover{text-decoration:underline}
 .status.ok{display:block;background:#eaf5ee;border:1px solid #bcdcc6;color:var(--ok)}
 .status.err{display:block;background:#f8eaea;border:1px solid #e0b4b4;color:var(--danger)}
 
+/* ---------- payment methods ---------- */
+.pay-methods{padding:14px 16px;border-bottom:1px solid var(--line)}
+.pay-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pay-badge{font-size:11px;font-weight:bold;border:1px solid var(--line);background:#fff;color:var(--ink);
+  padding:6px 10px;border-radius:3px;display:flex;align-items:center;gap:6px}
+.pay-badge .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.pay-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+
 /* ---------- footer ---------- */
 .site-footer{background:var(--navy-dark);color:#c9d4e0;font-size:13px}
 .site-footer .inner{max-width:1180px;margin:0 auto;padding:34px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
@@ -204,7 +212,7 @@ a:hover{text-decoration:underline}
   <div class="inner">
     <div class="breadcrumb"><a href="#">Home</a> &rsaquo; <a href="#catalog">Products</a> &rsaquo; Snack Catalog</div>
     <h2>Snack Product Catalog</h2>
-    <p>Browse available products below, add items to your order, and submit. Payment is collected in cash at the time of pickup.</p>
+    <p>Browse available products below, add items to your order, and submit. Payment is collected at delivery — we accept Cash, Cash App, Venmo, PayPal, and paper checks.</p>
   </div>
 </div>
 
@@ -252,6 +260,19 @@ a:hover{text-decoration:underline}
             <div class="trow grand"><span>Total Due</span><span id="totalAmt" data-testid="total">$0.00</span></div>
           </div>
 
+          <!-- ACCEPTED PAYMENT METHODS -->
+          <div class="pay-methods">
+            <div class="block-label">Accepted Payment Methods</div>
+            <div class="pay-list" data-testid="payment-methods">
+              <span class="pay-badge"><span class="dot" style="background:#2e7d46"></span>Cash</span>
+              <span class="pay-badge"><span class="dot" style="background:#00d632"></span>Cash App</span>
+              <span class="pay-badge"><span class="dot" style="background:#3d95ce"></span>Venmo</span>
+              <span class="pay-badge"><span class="dot" style="background:#003087"></span>PayPal</span>
+              <span class="pay-badge"><span class="dot" style="background:#6b6b6b"></span>Paper Check</span>
+            </div>
+            <p class="pay-note">Payment is collected at delivery. We accept Cash, Cash App, Venmo, PayPal, and paper checks.</p>
+          </div>
+
           <!-- FIELDS -->
           <div class="fields">
             <div class="field">
@@ -273,7 +294,7 @@ a:hover{text-decoration:underline}
 
             <button type="submit" class="submit-btn" id="submitBtn" disabled data-testid="submit-order-button">Submit Order</button>
             <div class="status" id="status"></div>
-            <p class="form-note" id="policy">Cash only at pickup. You will pay the total due when you collect your order.</p>
+            <p class="form-note" id="policy">Payment is collected at delivery. We accept Cash, Cash App, Venmo, PayPal, and paper checks.</p>
           </div>
         </form>
       </div>
@@ -286,7 +307,7 @@ a:hover{text-decoration:underline}
   <div class="inner">
     <div>
       <h4>Yenner Snack Mart</h4>
-      <p style="color:#9fb0c4">The official snack ordering portal for students and staff. Cash payment only.</p>
+      <p style="color:#9fb0c4">The official snack ordering portal for students and staff. Payment collected at delivery.</p>
     </div>
     <div>
       <h4>Products</h4>
@@ -316,7 +337,7 @@ a:hover{text-decoration:underline}
 
 <!-- NOTICE BAR -->
 <div class="notice-bar">
-  💵 <strong>CASH ONLY</strong> • Please bring the exact amount whenever possible. No Cash App, Venmo, Apple Pay, or other digital payments at school.
+  💳 <strong>PAYMENT COLLECTED AT DELIVERY</strong> • We accept Cash, Cash App, Venmo, PayPal, and paper checks.
 </div>
 
 <!-- Snack data (the ONLY file to edit) -->
@@ -497,7 +518,7 @@ a:hover{text-decoration:underline}
         .then(function(res){
           if(res.ok){
             status.className = "status ok";
-            status.textContent = "Order submitted successfully. Please bring cash at pickup.";
+            status.textContent = "Order submitted successfully. Payment will be collected at delivery.";
             cart = {}; tipMode = "none"; customTip = 0; $("customTip").value = "";
             $("tipOptions").querySelectorAll(".tip-opt").forEach(function(x){ x.classList.remove("active"); });
             $("tipOptions").querySelector('[data-tip="none"]').classList.add("active");
