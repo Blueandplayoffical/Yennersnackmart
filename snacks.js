@@ -17,11 +17,11 @@
 
 const snacks = [
   {
-    emoji: "🌶️",
-    name: "Any Kind of Spicy Chips",
-    price: 1.00,
-    category: "Chips",
-    badge: "Popular"
+    emoji: "🍯",
+    name: "HoneyBuns",
+    price: 2.00,
+    category: "Pastries",
+    badge: "⭐ Best Seller"
   },
   {
     emoji: "🟢",
@@ -30,22 +30,22 @@ const snacks = [
     category: "Drinks"
   },
   {
-    emoji: "🍋",
-    name: "Lemonade Arizona",
+    emoji: "🌶️",
+    name: "Any Kind of Spicy Chips",
     price: 1.00,
-    category: "Drink"
-  },
-  {
-    emoji: "🍯",
-    name: "Honeybuns",
-    price: 1.00,
-    category: "Pastries"
+    category: "Chips",
+    badge: "Popular"
   },
   {
     emoji: "🟢",
-    name: "Large Sprite",
+    name: "Large Sprites",
     price: 2.00,
-    category: "Drink",
-    badge: "Largest Drink"
+    category: "Drinks"
+  },
+  {
+    emoji: "🍋",
+    name: "Small Arizona",
+    price: 1.00,
+    category: "Drinks"
   }
 ];
