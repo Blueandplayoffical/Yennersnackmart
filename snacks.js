@@ -1,5 +1,5 @@
 /*
- * ┌─────────────────────────────────────────────────────────────┐
+ * ┌────────────────────────────────────────────────────────────┐
  * │  THE SNACK MENU — snack data                                  │
  * │  This is the ONLY file you edit to update the shop.           │
  * │                                                               │
@@ -12,40 +12,40 @@
  * │    badge     (string)  optional tag e.g. "New"    [optional]  │
  * │                                                               │
  * │  New categories appear automatically — no HTML editing.       │
- * └─────────────────────────────────────────────────────────────┘
+ * └────────────────────────────────────────────────────────────┘
  */
 
 const snacks = [
   {
-    emoji: "🥤",
-    name: "Capri Sun",
-    price: 1.00,
-    category: "Drinks"
-  },
-  {
     emoji: "🌶️",
-    name: "Takis",
+    name: "Any Kind of Spicy Chips",
     price: 1.00,
     category: "Chips",
     badge: "Popular"
   },
   {
-    emoji: "🍫",
-    name: "M&Ms",
-    price: 1.25,
-    category: "Candy"
+    emoji: "🟢",
+    name: "Small Sprite Can",
+    price: 1.00,
+    category: "Drinks"
   },
   {
-    emoji: "🍬",
-    name: "Trident Tropical",
-    price: 2.00,
-    category: "Gum",
-    badge: "⭐ Best Seller"
+    emoji: "🍋",
+    name: "Lemonade Arizona",
+    price: 1.00,
+    category: "Drink"
+  },
+  {
+    emoji: "🍯",
+    name: "Honeybuns",
+    price: 1.00,
+    category: "Pastries"
   },
   {
     emoji: "🟢",
-    name: "Extra Gum 15ct",
-    price: 1.80,
-    category: "Gum"
+    name: "Large Sprite",
+    price: 2.00,
+    category: "Drink",
+    badge: "Largest Drink"
   }
 ];
